@@ -137,9 +137,6 @@ if 'RENDER' in os.environ:
 else:
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# Ensure the media directory exists
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
