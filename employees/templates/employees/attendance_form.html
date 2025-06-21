@@ -1,0 +1,252 @@
+{% extends 'employees/base.html' %}
+{% load widget_tweaks %}
+{% block title %}تسجيل الحضور{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="w-100">
+    <h2 class="mb-4 text-center fw-bold">تسجيل الحضور</h2>
+    <form method="post" class="bg-white rounded-3 shadow-sm p-4 mx-auto" style="max-width: 100%;">
+      {% csrf_token %}
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.employee.label }}</label>
+          {{ form.employee|add_class:'select2 form-control' }}
+          {{ form.employee.errors }}
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.date.label }}</label>
+          {{ form.date|add_class:'form-control'|attr:'type:date' }}
+          {{ form.date.errors }}
+        </div>
+      </div>
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.is_absent.label }}</label>
+          {{ form.is_absent|add_class:'form-check-input' }}
+          {{ form.is_absent.errors }}
+        </div>
+      </div>
+      <div class="row g-4 mb-3" id="absence-reason-row" style="display:none;">
+        <div class="col-12">
+          <label class="form-label fw-semibold">{{ form.absence_reason.label }}</label>
+          {{ form.absence_reason|add_class:'form-control' }}
+          {{ form.absence_reason.errors }}
+        </div>
+      </div>
+      <div class="row g-4 mb-3 attendance-fields">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.check_in.label }}</label>
+          {{ form.check_in|add_class:'form-control'|attr:'type:time'|attr:'step:60' }}
+          {{ form.check_in.errors }}
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.check_out.label }}</label>
+          {{ form.check_out|add_class:'form-control'|attr:'type:time'|attr:'step:60' }}
+          {{ form.check_out.errors }}
+        </div>
+      </div>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="row mt-5">
+        <div class="col-12 d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm"><i class="bi bi-save"></i> حفظ</button>
+          <a href="{% url 'attendance_list' %}" class="btn btn-outline-secondary px-5 py-2">إلغاء</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* توحيد شكل وارتفاع جميع الحقول */
+input.form-control,
+select.form-control,
+textarea.form-control {
+    border-radius: 1rem !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-height: 48px;
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem !important;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+input[type="checkbox"].form-check-input,
+input[type="checkbox"].form-check-input.ms-2,
+input[type="checkbox"].form-check-input:checked,
+input[type="checkbox"].form-check-input:focus {
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    min-width: 2.2rem !important;
+    min-height: 2.2rem !important;
+    border-radius: 0.5rem !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border: 2px solid #1976d2 !important;
+    background: #fff !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    outline: none !important;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-block;
+}
+input[type="checkbox"].form-check-input:checked {
+    background-color: #1976d2 !important;
+    border-color: #1976d2 !important;
+}
+input[type="checkbox"].form-check-input:checked::after {
+    content: "";
+    position: absolute;
+    left: 0.65rem;
+    top: 0.25rem;
+    width: 0.5rem;
+    height: 1rem;
+    border: solid #fff;
+    border-width: 0 0.3rem 0.3rem 0;
+    display: block;
+    transform: rotate(45deg);
+}
+input[type="date"].form-control,
+input[type="time"].form-control {
+    direction: rtl;
+    text-align: right;
+}
+.select2-container--bootstrap-5 .select2-selection--single {
+    border-radius: 1rem !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-height: 48px;
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem !important;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection--single {
+    text-align: right;
+    direction: rtl;
+    padding-right: 1.5rem !important;
+    padding-left: 2.5rem !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .custom-chevron {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 2;
+}
+.select2-container--bootstrap-5 .select2-selection__placeholder {
+    color: #aaa !important;
+    font-size: 1.1rem;
+}
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-radius: 1rem !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    border: none;
+    font-size: 1.15rem;
+}
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 1rem 1.5rem;
+}
+.select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background: #f1f3f4 !important;
+    color: #222 !important;
+}
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background: #f1f3f4 !important;
+    color: #222 !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection__clear {
+    position: absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    float: none !important;
+    z-index: 10;
+    font-size: 1.3rem;
+    color: #888 !important;
+    background: transparent !important;
+    cursor: pointer;
+    display: none !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection--single {
+    position: relative;
+}
+.select2-container--bootstrap-5 .select2-selection__clear,
+.select2-container--default .select2-selection__clear,
+.select2-selection__clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+#absence-reason-row .form-control {
+    border: 2px solid #ff9800 !important;
+    box-shadow: 0 2px 8px rgba(255,152,0,0.08);
+}
+</style>
+<script>
+$(document).ready(function() {
+    $('#id_employee').select2({
+        theme: "bootstrap-5",
+        placeholder: "اختر الموظف",
+        allowClear: true,
+        dir: "rtl"
+    });
+    // إضافة أيقونة SVG يدويًا للسهم في RTL
+    setTimeout(function() {
+        $('.select2-container--rtl .select2-selection--single').each(function() {
+            if ($(this).find('.custom-chevron').length === 0) {
+                $(this).append('<span class="custom-chevron" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#888" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg></span>');
+            }
+        });
+    }, 200);
+    function toggleAbsenceFields() {
+      if ($('#id_is_absent').is(':checked')) {
+        $('#absence-reason-row').show();
+        $('.attendance-fields').hide();
+      } else {
+        $('#absence-reason-row').hide();
+        $('.attendance-fields').show();
+      }
+    }
+    $('#id_is_absent').on('change', toggleAbsenceFields);
+    toggleAbsenceFields();
+});
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    var checkIn = document.getElementById('id_check_in');
+    var checkOut = document.getElementById('id_check_out');
+    if (checkIn && checkIn.value && (checkIn.value.includes('AM') || checkIn.value.includes('PM'))) {
+        checkIn.value = convertTo24Hour(checkIn.value);
+    }
+    if (checkOut && checkOut.value && (checkOut.value.includes('AM') || checkOut.value.includes('PM'))) {
+        checkOut.value = convertTo24Hour(checkOut.value);
+    }
+    function convertTo24Hour(timeStr) {
+        var [time, modifier] = timeStr.split(' ');
+        var [hours, minutes] = time.split(':');
+        if (modifier === 'PM' && hours !== '12') {
+            hours = String(parseInt(hours, 10) + 12);
+        }
+        if (modifier === 'AM' && hours === '12') {
+            hours = '00';
+        }
+        return `${hours}:${minutes}`;
+    }
+});
+</script>
+{% endblock %} 

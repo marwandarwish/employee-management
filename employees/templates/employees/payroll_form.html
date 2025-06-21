@@ -1,0 +1,175 @@
+{% extends 'employees/base.html' %}
+{% load widget_tweaks %}
+{% block title %}تسجيل راتب/سحب{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="w-100">
+    <h2 class="mb-4 text-center fw-bold">تسجيل راتب/سحب</h2>
+    <form method="post" class="bg-white rounded-3 shadow-sm p-4 mx-auto" style="max-width: 100%;">
+      {% csrf_token %}
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.employee.label }}</label>
+          {{ form.employee|add_class:'select2 form-control' }}
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.date.label }}</label>
+          {{ form.date|add_class:'form-control'|attr:'type:date' }}
+        </div>
+      </div>
+      <div class="row g-4 mb-3">
+        <div class="col-12">
+          <label class="form-label fw-semibold">{{ form.amount.label }}</label>
+          {{ form.amount|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="row g-4 mb-3">
+        <div class="col-12">
+          <label class="form-label fw-semibold">{{ form.note.label }}</label>
+          {{ form.note|add_class:'form-control' }}
+        </div>
+      </div>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="row mt-5">
+        <div class="col-12 d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm"><i class="bi bi-save"></i> حفظ</button>
+          <a href="{% url 'payroll_list' %}" class="btn btn-outline-secondary px-5 py-2">إلغاء</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<style>
+.select2-container--bootstrap-5 .select2-selection--single {
+    border-radius: 1rem !important;
+    min-height: 48px;
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem !important;
+    background: #fff;
+    border: 2px solid #e0e0e0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection--single {
+    text-align: right;
+    direction: rtl;
+    padding-right: 1.5rem !important;
+    padding-left: 2.5rem !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .custom-chevron {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 2;
+}
+.select2-container--bootstrap-5 .select2-selection__placeholder {
+    color: #aaa !important;
+    font-size: 1.1rem;
+}
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-radius: 1rem !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    border: none;
+    font-size: 1.15rem;
+}
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 1rem 1.5rem;
+}
+.select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background: #f1f3f4 !important;
+    color: #222 !important;
+}
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background: #f1f3f4 !important;
+    color: #222 !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection__clear {
+    position: absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    float: none !important;
+    z-index: 10;
+    font-size: 1.3rem;
+    color: #888 !important;
+    background: transparent !important;
+    cursor: pointer;
+    display: none !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection--single {
+    position: relative;
+}
+.select2-container--bootstrap-5 .select2-selection__clear,
+.select2-container--default .select2-selection__clear,
+.select2-selection__clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+input.form-control,
+select.form-control,
+textarea.form-control {
+    border-radius: 1rem !important;
+    min-height: 48px;
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem !important;
+    background: #fff;
+    border: 2px solid #e0e0e0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input.form-control:focus,
+select.form-control:focus,
+textarea.form-control:focus {
+    border-color: #1976d2 !important;
+    box-shadow: 0 4px 16px rgba(25,118,210,0.10);
+    outline: none !important;
+}
+.select2-container--bootstrap-5 .select2-selection--single {
+    border-radius: 1rem !important;
+    min-height: 48px;
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem !important;
+    background: #fff;
+    border: 2px solid #e0e0e0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+}
+.select2-container--bootstrap-5.select2-container--focus .select2-selection--single {
+    border-color: #1976d2 !important;
+    box-shadow: 0 4px 16px rgba(25,118,210,0.10);
+}
+</style>
+<script>
+$(document).ready(function() {
+    $('#id_employee').select2({
+        theme: "bootstrap-5",
+        placeholder: "اختر الموظف",
+        allowClear: true,
+        dir: "rtl"
+    });
+    // إضافة أيقونة SVG يدويًا للسهم في RTL
+    setTimeout(function() {
+        $('.select2-container--rtl .select2-selection--single').each(function() {
+            if ($(this).find('.custom-chevron').length === 0) {
+                $(this).append('<span class="custom-chevron" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#888" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg></span>');
+            }
+        });
+    }, 200);
+});
+</script>
+{% endblock %} 

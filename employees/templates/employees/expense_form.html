@@ -1,0 +1,110 @@
+{% extends 'employees/base.html' %}
+{% load widget_tweaks %}
+{% block title %}إضافة مصروف{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="w-100">
+    <h2 class="mb-4 text-center fw-bold">إضافة مصروف</h2>
+    <form method="post" class="bg-white rounded-3 shadow-sm p-4 mx-auto" style="max-width: 100%;">
+      {% csrf_token %}
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.category.label }}</label>
+          <div class="input-group">
+            {{ form.category|add_class:'select2 form-control fs-5 py-3' }}
+            <button type="button" class="btn btn-outline-success fs-4 px-4" id="add-category-btn" title="إضافة فئة جديدة"><i class="bi bi-plus-circle"></i></button>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.amount.label }}</label>
+          {{ form.amount|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.date.label }}</label>
+          {{ form.date|add_class:'form-control'|attr:'type:date' }}
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">{{ form.description.label }}</label>
+          {{ form.description|add_class:'form-control' }}
+        </div>
+      </div>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="row mt-5">
+        <div class="col-12 d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm"><i class="bi bi-save"></i> حفظ</button>
+          <a href="{% url 'expense_list' %}" class="btn btn-outline-secondary px-5 py-2">إلغاء</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+/* تكبير حقل select2 */
+.select2-container--default .select2-selection--single {
+    min-height: 56px !important;
+    height: 56px !important;
+    font-size: 1.35rem !important;
+    padding: 16px 12px !important;
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 56px !important;
+    font-size: 1.25rem !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 56px !important;
+}
+#add-category-btn {
+    font-size: 2rem !important;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+</style>
+<script>
+$(document).ready(function() {
+  $('.select2').select2({
+    dir: 'rtl',
+    width: '100%',
+    dropdownParent: $('.select2').parent(),
+    language: {
+      noResults: function() { return "لا توجد نتائج"; },
+      searching: function() { return "جاري البحث..."; }
+    }
+  });
+
+  // إضافة فئة جديدة
+  $('#add-category-btn').on('click', function() {
+    let name = prompt('أدخل اسم الفئة الجديدة:');
+    if (name && name.trim().length > 0) {
+      $.post({
+        url: '{% url "expense_category_add" %}',
+        data: {name: name, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        success: function(data) {
+          if (data.id) {
+            let newOption = new Option(data.name, data.id, true, true);
+            $('select[name="category"]').append(newOption).trigger('change');
+            $('.select2').select2('close');
+          }
+        },
+        error: function(xhr) {
+          alert(xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'حدث خطأ!');
+        }
+      });
+    }
+  });
+});
+</script>
+{% endblock %} 

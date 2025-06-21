@@ -1,0 +1,47 @@
+{% extends 'employees/base.html' %}
+{% block title %}الموظفون{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-2">
+    <h1 class="mb-0">الموظفون</h1>
+    <a href="{% url 'employee_create' %}" class="btn btn-success shadow-sm px-4 py-2 d-block d-md-inline-block" style="width: 100%; max-width: 250px;">
+        <i class="bi bi-person-plus"></i> إضافة موظف
+    </a>
+</div>
+<div class="row g-4">
+    {% for employee in employees %}
+    <div class="col-12 col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    {% if employee.profile_pic %}
+                        <img src="{{ employee.profile_pic.url }}" class="rounded-circle border border-2" style="width: 90px; height: 90px; object-fit: cover;" alt="صورة الموظف">
+                    {% else %}
+                        <img src="/media/default.png" class="rounded-circle border border-2" style="width: 90px; height: 90px; object-fit: cover;" alt="صورة افتراضية">
+                    {% endif %}
+                </div>
+                <h5 class="card-title mb-1">{{ employee.full_name }}</h5>
+                <p class="text-muted mb-1"><i class="bi bi-phone"></i> {{ employee.mobile_phone|default:"لم تتم الإضافة" }}</p>
+                <span class="badge {% if employee.is_active %}bg-success{% else %}bg-secondary{% endif %} mb-2">
+                    {{ employee.is_active|yesno:"نشط,غير نشط" }}
+                </span>
+                <div class="d-flex justify-content-center gap-2 mt-2">
+                    <a href="{% url 'employee_detail' employee.pk %}" class="btn btn-outline-primary btn-sm" title="تفاصيل"><i class="bi bi-eye"></i></a>
+                    <a href="{% url 'employee_update' employee.pk %}" class="btn btn-outline-warning btn-sm" title="تعديل"><i class="bi bi-pencil"></i></a>
+                    <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-outline-danger btn-sm" title="حذف"><i class="bi bi-trash"></i></a>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 text-center small text-muted">
+                <span><i class="bi bi-credit-card-2-front"></i> {{ employee.national_id|default:"لم تتم الإضافة" }}</span><br>
+                <span><i class="bi bi-calendar-event"></i> {{ employee.date_of_joining|default:"لم تتم الإضافة" }}</span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">لا يوجد موظفون.</div>
+        </div>
+    {% endfor %}
+</div>
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %} 

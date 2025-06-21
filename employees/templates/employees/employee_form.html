@@ -1,0 +1,89 @@
+{% extends 'employees/base.html' %}
+{% load widget_tweaks %}
+{% block title %}نموذج الموظف{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="w-100">
+    <h2 class="mb-4 text-center fw-bold">{{ form_title|default:'نموذج الموظف' }}</h2>
+    <form method="post" enctype="multipart/form-data" class="bg-white rounded-3 shadow-sm p-4 mx-auto" style="max-width: 100%;">
+      {% csrf_token %}
+      
+      <!-- Row 1 -->
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.full_name.label }}</label>
+          {{ form.full_name|add_class:'form-control' }}
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.nationality.label }}</label>
+          {{ form.nationality|add_class:'select2 form-control' }}
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.national_id.label }}</label>
+          {{ form.national_id|add_class:'form-control' }}
+        </div>
+      </div>
+      
+      <!-- Row 2 -->
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.mobile_phone.label }}</label>
+          {{ form.mobile_phone|add_class:'form-control' }}
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.date_of_joining.label }}</label>
+          {{ form.date_of_joining|add_class:'form-control'|attr:'type:date' }}
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.work_location.label }}</label>
+          {{ form.work_location|add_class:'form-control' }}
+        </div>
+      </div>
+      
+      <!-- Row 3 -->
+      <div class="row g-4 mb-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold">{{ form.base_salary.label }}</label>
+          {{ form.base_salary|add_class:'form-control' }}
+        </div>
+        <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">{{ form.variable_incentives.label }}</label>
+            {{ form.variable_incentives|add_class:'form-control' }}
+        </div>
+        <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">{{ form.profile_pic.label }}</label>
+            {{ form.profile_pic|add_class:'form-control' }}
+        </div>
+      </div>
+      
+      <!-- Row 4: Special Fields -->
+      <div class="row g-4 align-items-center mb-3">
+        <div class="col-12 d-flex justify-content-center">
+            <div class="form-check form-switch form-check-reverse mt-4 fs-5">
+                {{ form.is_active|add_class:"form-check-input"|attr:"role:switch" }}
+                <label class="form-check-label ms-3" for="{{ form.is_active.id_for_label }}">
+                  {{ form.is_active.label }}
+                </label>
+            </div>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <!-- Buttons -->
+      <div class="row mt-5">
+        <div class="col-12 d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm"><i class="bi bi-save"></i> حفظ</button>
+          <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary px-5 py-2">إلغاء</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %} 

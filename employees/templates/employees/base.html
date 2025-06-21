@@ -1,0 +1,437 @@
+{% load widget_tweaks %}
+{% load static %}
+{% load get_employee_for_user %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}إدارة الموظفين{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <style>
+        body, .container-fluid, .container, .table, .form-label, .form-control, .btn, .card, .card-body, th, td {
+            font-size: 1.15rem !important;
+        }
+        h1, .fs-1, .fs-2, .fs-3, .fs-4, .fs-5 {
+            font-size: 1.35rem !important;
+        }
+        h1 {
+            font-size: 2rem !important;
+        }
+        .sidebar .nav-link, .sidebar .navbar-brand {
+            font-size: 1.18rem !important;
+        }
+        .offcanvas-title, .offcanvas .nav-link {
+            font-size: 1.18rem !important;
+        }
+        .btn, .form-control {
+            font-size: 1.13rem !important;
+        }
+        body {
+            background: var(--main-bg, #f6f8fc);
+            color: var(--main-text, #222);
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: #fff;
+            box-shadow: 0 0 30px #0001;
+        }
+        .sidebar .nav-link, .sidebar .navbar-brand {
+            color: #fff !important;
+        }
+        .sidebar .nav-link.active, .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        .night-mode {
+            --main-bg: #181c2a;
+            --main-text: #f3f4f6;
+        }
+        .night-mode .sidebar {
+            background: linear-gradient(135deg, #1e293b 0%, #6366f1 100%);
+            color: #fff;
+        }
+        .night-mode .card, .night-mode .modal-content {
+            background: #23263a;
+            color: #f3f4f6;
+        }
+        .night-mode .btn, .night-mode .form-control {
+            background: #23263a;
+            color: #f3f4f6;
+            border-color: #374151;
+        }
+        .night-mode .btn-primary, .night-mode .btn-success {
+            background: #6366f1;
+            border-color: #6366f1;
+        }
+        .night-mode .btn-outline-primary {
+            color: #6366f1;
+            border-color: #6366f1;
+        }
+        .night-mode .alert-info {
+            background: #23263a;
+            color: #60a5fa;
+            border-color: #6366f1;
+        }
+        .toggle-dark {
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: #6366f1;
+            background: #fff;
+            border-radius: 50%;
+            padding: 0.3em 0.5em;
+            border: none;
+            transition: background 0.2s;
+        }
+        .night-mode .toggle-dark {
+            background: #23263a;
+            color: #fff;
+        }
+        @media (max-width: 991.98px) {
+            .sidebar {
+                display: none !important;
+            }
+            .main-content {
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+            }
+        }
+        .select2-container--bootstrap-5 .select2-selection {
+            min-height: 38px; /* نفس ارتفاع input في Bootstrap */
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            direction: rtl;
+            text-align: right;
+        }
+        .select2-container--bootstrap-5 .select2-selection__rendered {
+            text-align: right;
+        }
+        .select2-container--bootstrap-5 .select2-selection__clear,
+        .select2-container--default .select2-selection__clear,
+        .select2-selection__clear {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            position: absolute !important;
+        }
+        .sidebar-slider {
+            position: fixed;
+            top: 0; right: 0;
+            height: 100vh;
+            background: #232a3b;
+            color: #fff;
+            width: 250px;
+            transition: width 0.3s;
+            z-index: 1040;
+            box-shadow: 0 0 30px #0002;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .sidebar-slider.collapsed {
+            width: 70px;
+        }
+        .sidebar-slider .sidebar-toggle {
+            position: absolute;
+            left: 12px;
+            top: 18px;
+            background: #232a3b;
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px #0001;
+            transition: left 0.3s;
+            z-index: 2;
+        }
+        .sidebar-slider.collapsed .sidebar-toggle {
+            left: 12px;
+        }
+        .sidebar-slider .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 18px 18px 18px;
+            border-bottom: 1px solid #2d3650;
+            min-height: 90px;
+            transition: padding 0.3s;
+        }
+        .sidebar-slider.collapsed .user-info {
+            flex-direction: column;
+            gap: 0;
+            padding: 24px 0 12px 0;
+        }
+        .sidebar-slider .user-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff3;
+        }
+        .sidebar-slider .user-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: opacity 0.3s;
+        }
+        .sidebar-slider.collapsed .user-details {
+            opacity: 0;
+            width: 0; height: 0;
+            overflow: hidden;
+        }
+        .sidebar-slider .user-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+        .sidebar-slider .user-email {
+            font-size: 0.95rem;
+            color: #b0b8d1;
+            white-space: nowrap;
+        }
+        .sidebar-slider .nav {
+            flex-direction: column;
+            margin-top: 18px;
+            gap: 4px;
+        }
+        .sidebar-slider .nav-link {
+            color: #fff;
+            font-size: 1.13rem;
+            padding: 12px 18px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
+        .sidebar-slider .nav-link.active, .sidebar-slider .nav-link:hover {
+            background: #2d3650;
+            color: #7dd3fc;
+        }
+        .sidebar-slider .nav-link .nav-icon {
+            font-size: 1.5rem;
+            min-width: 28px;
+            text-align: center;
+        }
+        .sidebar-slider.collapsed .nav-link span {
+            display: none;
+        }
+        .sidebar-slider .nav-link[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #232a3b;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px #0002;
+            z-index: 10;
+            opacity: 1;
+            pointer-events: none;
+        }
+        .sidebar-slider.collapsed .nav-link[title]:hover::after {
+            opacity: 1;
+        }
+        .sidebar-slider .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 18px 24px 18px;
+            border-top: 1px solid #2d3650;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sidebar-slider.collapsed .sidebar-footer span {
+            display: none;
+        }
+        .main-content {
+            margin-right: 250px;
+            transition: margin-right 0.3s;
+        }
+        .sidebar-slider.collapsed ~ .main-content {
+            margin-right: 70px;
+        }
+        @media (max-width: 991.98px) {
+            .sidebar-slider { display: none !important; }
+            .main-content { margin-right: 0 !important; }
+        }
+    </style>
+    {% block extra_head %}
+    {{ block.super }}
+    {% endblock %}
+</head>
+<body>
+<!-- Top navbar for mobile -->
+<nav class="navbar navbar-light bg-white d-lg-none shadow-sm mb-2">
+  <div class="container-fluid justify-content-between">
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+      <i class="bi bi-list"></i>
+    </button>
+    <span class="navbar-brand mb-0 h1">إدارة الموظفين</span>
+  </div>
+</nav>
+<div class="d-flex">
+    <!-- Sidebar: hidden on mobile, offcanvas on mobile -->
+    <div class="sidebar-slider" id="sidebarSlider">
+        <button class="sidebar-toggle" id="sidebarToggle" title="توسيع/تصغير القائمة">
+            <i class="bi bi-chevron-double-left"></i>
+        </button>
+        <div class="user-info">
+            {% if user.profile_pic %}
+                <img src="{{ user.profile_pic.url }}" class="user-avatar" alt="User">
+            {% else %}
+                {% with employee=employees|get_employee_for_user:user %}
+                    {% if employee and employee.profile_pic %}
+                        <img src="{{ employee.profile_pic.url }}" class="user-avatar" alt="User">
+                    {% else %}
+                        <img src="{% static 'default.png' %}" class="user-avatar" alt="User">
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+            <div class="user-details">
+                <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                <span class="user-email">{{ user.email }}</span>
+            </div>
+        </div>
+        <ul class="nav flex-column mt-2">
+            {% if perms.employees.view_employee %}
+            <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'employee_list' %}active{% endif %}" href="{% url 'employee_list' %}" title="الموظفون"><i class="bi bi-person-badge nav-icon"></i> <span>الموظفون</span></a></li>
+            {% endif %}
+            {% if perms.employees.view_attendance %}
+            <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'attendance_list' %}active{% endif %}" href="{% url 'attendance_list' %}" title="الحضور"><i class="bi bi-calendar-check nav-icon"></i> <span>الحضور</span></a></li>
+            {% endif %}
+            {% if perms.employees.view_payroll %}
+            <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'payroll_list' %}active{% endif %}" href="{% url 'payroll_list' %}" title="الرواتب"><i class="bi bi-cash-coin nav-icon"></i> <span>الرواتب</span></a></li>
+            {% endif %}
+            {% if perms.employees.view_expense %}
+            <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'expense_list' %}active{% endif %}" href="{% url 'expense_list' %}" title="المصروفات"><i class="bi bi-wallet2 nav-icon"></i> <span>المصروفات</span></a></li>
+            {% endif %}
+            {% if perms.employees.view_report %}
+            <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}" title="لوحة التقارير"><i class="bi bi-bar-chart nav-icon"></i> <span>لوحة التقارير</span></a></li>
+            {% endif %}
+        </ul>
+        <div class="sidebar-footer mt-auto">
+            <a href="#" class="d-flex align-items-center gap-2 text-white-50"><i class="bi bi-gear"></i> <span>الإعدادات</span></a>
+            <a href="#" class="d-flex align-items-center gap-2 text-white-50"><i class="bi bi-person-circle"></i> <span>الحساب</span></a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="d-flex align-items-center gap-2 text-white-50"><i class="bi bi-box-arrow-right"></i> <span>تسجيل الخروج</span></a>
+            {% else %}
+                <a href="{% url 'login' %}" class="d-flex align-items-center gap-2 text-white-50"><i class="bi bi-box-arrow-in-left"></i> <span>تسجيل الدخول</span></a>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Offcanvas sidebar for mobile -->
+    <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel" style="max-width: 320px;">
+      <div class="offcanvas-header bg-primary text-white rounded-top-4" style="min-height: 90px;">
+        <h5 class="offcanvas-title fs-3 fw-bold" id="sidebarOffcanvasLabel">جدول أعمالي</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body p-0 d-flex flex-column align-items-stretch" style="background: #fff;">
+        <ul class="nav flex-column w-100 mb-auto px-2 pt-3">
+          <li class="nav-item mb-2"><a class="nav-link py-3 fs-5 d-flex align-items-center gap-3 rounded-3 {% if request.resolver_match.url_name == 'employee_list' %}active bg-primary bg-opacity-10 border-primary border-2{% endif %}" href="{% url 'employee_list' %}"><i class="bi bi-person-badge fs-4 text-primary"></i> الموظفون</a></li>
+          <li class="nav-item mb-2"><a class="nav-link py-3 fs-5 d-flex align-items-center gap-3 rounded-3 {% if request.resolver_match.url_name == 'attendance_list' %}active bg-warning bg-opacity-10 border-warning border-2{% endif %}" href="{% url 'attendance_list' %}"><span class="d-inline-block rounded-circle bg-warning" style="width:18px;height:18px;"></span><i class="bi bi-calendar-check fs-4 text-warning"></i> الحضور</a></li>
+          <li class="nav-item mb-2"><a class="nav-link py-3 fs-5 d-flex align-items-center gap-3 rounded-3 {% if request.resolver_match.url_name == 'payroll_list' %}active bg-success bg-opacity-10 border-success border-2{% endif %}" href="{% url 'payroll_list' %}"><span class="d-inline-block rounded-circle bg-success" style="width:18px;height:18px;"></span><i class="bi bi-cash-coin fs-4 text-success"></i> الرواتب</a></li>
+          <li class="nav-item mb-2"><a class="nav-link py-3 fs-5 d-flex align-items-center gap-3 rounded-3 {% if request.resolver_match.url_name == 'expense_list' %}active bg-info bg-opacity-10 border-info border-2{% endif %}" href="{% url 'expense_list' %}"><span class="d-inline-block rounded-circle bg-info" style="width:18px;height:18px;"></span><i class="bi bi-wallet2 fs-4 text-info"></i> المصروفات</a></li>
+          <li class="nav-item mb-2"><a class="nav-link py-3 fs-5 d-flex align-items-center gap-3 rounded-3 {% if request.resolver_match.url_name == 'dashboard' %}active bg-secondary bg-opacity-10 border-secondary border-2{% endif %}" href="{% url 'dashboard' %}"><span class="d-inline-block rounded-circle bg-secondary" style="width:18px;height:18px;"></span><i class="bi bi-bar-chart fs-4 text-secondary"></i> لوحة التقارير</a></li>
+        </ul>
+        <hr class="my-2">
+        <div class="px-3 pb-3 mt-auto">
+          <ul class="nav flex-column">
+            <li class="nav-item mb-2"><a class="nav-link d-flex align-items-center gap-2 fs-5" href="#"><i class="bi bi-gear fs-4"></i> الإعدادات</a></li>
+            <li class="nav-item mb-2"><a class="nav-link d-flex align-items-center gap-2 fs-5" href="#"><i class="bi bi-person-circle fs-4"></i> الحساب</a></li>
+            {% if user.is_authenticated %}
+              <li class="nav-item"><a class="nav-link d-flex align-items-center gap-2 fs-5" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right fs-4"></i> تسجيل الخروج</a></li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link d-flex align-items-center gap-2 fs-5" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-left fs-4"></i> تسجيل الدخول</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <main class="flex-grow-1 p-4 main-content">
+        {% if messages %}
+          <div class="container mt-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    // Toggle night mode
+    const toggleBtn = document.getElementById('toggleDark');
+    if(toggleBtn){
+      toggleBtn.onclick = function() {
+          document.body.classList.toggle('night-mode');
+          localStorage.setItem('nightMode', document.body.classList.contains('night-mode'));
+      };
+    }
+    // For mobile sidebar
+    const toggleBtnMobile = document.getElementById('toggleDarkMobile');
+    if(toggleBtnMobile){
+      toggleBtnMobile.onclick = function() {
+          document.body.classList.toggle('night-mode');
+          localStorage.setItem('nightMode', document.body.classList.contains('night-mode'));
+      };
+    }
+    // Load night mode from localStorage
+    if (localStorage.getItem('nightMode') === 'true') {
+        document.body.classList.add('night-mode');
+    }
+    // سايدبار سلايدر
+    const sidebar = document.getElementById('sidebarSlider');
+    const toggleBtnSidebar = document.getElementById('sidebarToggle');
+    toggleBtnSidebar.onclick = function() {
+        sidebar.classList.toggle('collapsed');
+        if(sidebar.classList.contains('collapsed')) {
+            toggleBtnSidebar.innerHTML = '<i class="bi bi-chevron-double-right"></i>';
+        } else {
+            toggleBtnSidebar.innerHTML = '<i class="bi bi-chevron-double-left"></i>';
+        }
+    };
+</script>
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // فعّل Select2 على كل select يحمل كلاس .select2
+    $('select.select2').select2({
+        theme: "bootstrap-5",
+        placeholder: "اختر",
+        allowClear: false,
+        dir: "rtl"
+    });
+    // أضف السهم SVG في اليسار لكل select2 RTL
+    setTimeout(function() {
+        $('.select2-container--rtl .select2-selection--single').each(function() {
+            if ($(this).find('.custom-chevron').length === 0) {
+                $(this).append('<span class="custom-chevron" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);pointer-events:none;z-index:2;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#888" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg></span>');
+            }
+        });
+    }, 200);
+});
+</script>
+{% endblock %}
+</body>
+</html> 

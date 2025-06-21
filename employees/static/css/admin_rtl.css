@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&display=swap');
+
+html, body {
+    direction: rtl !important;
+    text-align: right !important;
+    font-family: 'Cairo', 'Tajawal', Arial, sans-serif !important;
+    background: #f6f8fc !important;
+}
+
+.sidebar, .main-sidebar, .sidebar-menu, .nav-sidebar {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+.brand-link, .user-panel, .sidebar .nav-link, .sidebar .nav-header {
+    text-align: right !important;
+    font-family: 'Cairo', 'Tajawal', Arial, sans-serif !important;
+}
+
+.card, .table, .content-wrapper, .content-header, .content {
+    direction: rtl !important;
+    text-align: right !important;
+    font-family: 'Cairo', 'Tajawal', Arial, sans-serif !important;
+}
+
+.card {
+    border-radius: 1rem !important;
+    box-shadow: 0 2px 16px #0001 !important;
+}
+
+.table th, .table td {
+    text-align: right !important;
+    font-size: 1.1rem !important;
+}
+
+.btn, .form-control {
+    font-size: 1.1rem !important;
+    font-family: 'Cairo', 'Tajawal', Arial, sans-serif !important;
+}
+
+.navbar, .dropdown-menu {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* تحسين الأيقونات في RTL */
+.nav-icon, .fas, .far, .fab {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+/* توسيط الكروت والإحصائيات */
+.card {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* تخصيص ألوان الكروت */
+.card-info { background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important; color: #fff !important; }
+.card-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important; color: #fff !important; }
+.card-warning { background: linear-gradient(135deg, #f59e42 0%, #fbbf24 100%) !important; color: #fff !important; }
+.card-danger { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; color: #fff !important; }
+
+/* تحسين الشارات */
+.badge, .badge-pill {
+    font-size: 1rem !important;
+    padding: 0.5em 1em !important;
+    border-radius: 1em !important;
+}
+
+/* تحسين السايدبار */
+.main-sidebar {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important;
+    color: #fff !important;
+}
+
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: #fff2 !important;
+    color: #fff !important;
+    border-radius: 0.75rem !important;
+}
+
+/* تحسين صورة المستخدم */
+.user-panel .image img {
+    border-radius: 50% !important;
+    border: 2px solid #fff !important;
+    width: 60px !important;
+    height: 60px !important;
+}
+
+/* تحسين الخط في كل عناصر الإدارة */
+*, .form-label, .form-control, .btn, .card, .card-body, th, td {
+    font-family: 'Cairo', 'Tajawal', Arial, sans-serif !important;
+} 

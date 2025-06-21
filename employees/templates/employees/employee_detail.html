@@ -1,0 +1,83 @@
+{% extends 'employees/base.html' %}
+{% block title %}تفاصيل الموظف{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+      <div class="card shadow-lg border-0 mb-4 p-0 overflow-hidden" style="background: linear-gradient(135deg, #f6f8fc 60%, #e0e7ff 100%);">
+        <div class="row g-0">
+          <div class="col-md-4 bg-white d-flex flex-column align-items-center justify-content-center p-4" style="min-height: 350px;">
+            {% if employee.profile_pic %}
+              <img src="{{ employee.profile_pic.url }}" class="rounded-circle border border-3 mb-3" style="width: 120px; height: 120px; object-fit: cover;" alt="صورة الموظف">
+            {% else %}
+              <img src="/media/default.png" class="rounded-circle border border-3 mb-3" style="width: 120px; height: 120px; object-fit: cover;" alt="صورة افتراضية">
+            {% endif %}
+            <h3 class="fw-bold mb-1">{{ employee.full_name }}</h3>
+            <span class="badge {% if employee.is_active %}bg-success{% else %}bg-secondary{% endif %} mb-2">{{ employee.is_active|yesno:"نشط,غير نشط" }}</span>
+            <div class="d-flex gap-2 mt-2">
+              <a href="{% url 'employee_update' employee.pk %}" class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil"></i> تعديل</a>
+              <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> حذف</a>
+            </div>
+          </div>
+          <div class="col-md-8 p-4">
+            <ul class="nav nav-tabs mb-3" id="empTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">المعلومات الأساسية</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">الحضور</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payroll-tab" data-bs-toggle="tab" data-bs-target="#payroll" type="button" role="tab">الرواتب</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="empTabsContent">
+              <div class="tab-pane fade show active" id="info" role="tabpanel">
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">الاسم الكامل:</div>
+                  <div class="col-6 col-md-8">{{ employee.full_name }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">الجنسية:</div>
+                  <div class="col-6 col-md-8">{{ employee.nationality.name|default:"لم تتم الإضافة" }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">الرقم القومي:</div>
+                  <div class="col-6 col-md-8">{{ employee.national_id|default:"لم تتم الإضافة" }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">الجوال:</div>
+                  <div class="col-6 col-md-8">{{ employee.mobile_phone|default:"لم تتم الإضافة" }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">تاريخ التعيين:</div>
+                  <div class="col-6 col-md-8">{{ employee.date_of_joining|default:"لم تتم الإضافة" }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">مكان العمل:</div>
+                  <div class="col-6 col-md-8">{{ employee.work_location|default:"لم تتم الإضافة" }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">الراتب الأساسي:</div>
+                  <div class="col-6 col-md-8">{{ employee.base_salary }}</div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-6 col-md-4 text-muted">الحوافز المتغيرة:</div>
+                  <div class="col-6 col-md-8">{{ employee.variable_incentives }}</div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="attendance" role="tabpanel">
+                <div class="alert alert-info">سجل الحضور سيظهر هنا (يمكن ربطه لاحقًا).</div>
+              </div>
+              <div class="tab-pane fade" id="payroll" role="tabpanel">
+                <div class="alert alert-info">سجل الرواتب سيظهر هنا (يمكن ربطه لاحقًا).</div>
+              </div>
+            </div>
+            <a href="{% url 'employee_list' %}" class="btn btn-link mt-3"><i class="bi bi-arrow-right"></i> العودة للقائمة</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,248 @@
+{% extends 'employees/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}سجلات الحضور{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">سجلات الحضور</h1>
+    {% if perms.employees.add_attendance %}
+    <a href="{% url 'attendance_record' %}" class="btn btn-success shadow-sm px-4 py-2">
+        <i class="bi bi-plus-circle"></i> تسجيل حضور
+    </a>
+    {% endif %}
+</div>
+
+<form method="get" class="row g-2 mb-4 align-items-end" id="attendance-filter-form">
+  <div class="col-12 mb-2">
+    <label class="form-label">{{ filter_form.filter_type.label }}</label>
+    <div class="d-flex gap-4">
+      {% for radio in filter_form.filter_type %}
+        <div class="form-check form-check-inline">
+          {{ radio.tag }}
+          <label class="form-check-label">{{ radio.choice_label }}</label>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <label class="form-label">{{ filter_form.employee.label }}</label>
+    <select name="{{ filter_form.employee.name }}" id="id_employee" class="form-select">
+        <option value="" {% if not filter_form.employee.value %}selected{% endif %}>الكل</option>
+        {% for emp in filter_form.fields.employee.queryset %}
+            <option value="{{ emp.pk }}" {% if filter_form.employee.value|stringformat:'s' == emp.pk|stringformat:'s' %}selected{% endif %}>{{ emp.full_name }}</option>
+        {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-2 filter-date-field">
+    <label class="form-label">{{ filter_form.date.label }}</label>
+    {% render_field filter_form.date class="form-control" %}
+  </div>
+  <div class="col-12 col-md-2 filter-range-field" style="display:none;">
+    <label class="form-label">{{ filter_form.start_date.label }}</label>
+    {% render_field filter_form.start_date class="form-control" %}
+  </div>
+  <div class="col-12 col-md-2 filter-range-field" style="display:none;">
+    <label class="form-label">{{ filter_form.end_date.label }}</label>
+    {% render_field filter_form.end_date class="form-control" %}
+  </div>
+  <div class="col-12 col-md-3">
+    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث</button>
+  </div>
+</form>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>الموظف</th>
+                        <th>التاريخ</th>
+                        <th>وقت الحضور</th>
+                        <th>وقت الانصراف</th>
+                        <th>مدة التأخير</th>
+                        <th>سبب الغياب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for record in attendance_records %}
+                    <tr{% if record.is_absent %} class="table-danger"{% endif %}>
+                        <td>{{ record.employee.full_name }}</td>
+                        <td>{{ record.date }}</td>
+                        <td>
+                          {% if record.is_absent %}
+                            غياب
+                          {% else %}
+                            {{ record.check_in|time:"h:i" }}
+                            {% if record.check_in.hour < 12 %}صباحًا{% else %}مساءً{% endif %}
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if record.is_absent %}
+                            غياب
+                          {% else %}
+                            {% if record.check_out %}
+                              {{ record.check_out|time:"h:i" }}
+                              {% if record.check_out.hour < 12 %}صباحًا{% else %}مساءً{% endif %}
+                            {% else %}-{% endif %}
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if record.out_difference_str %}
+                            {{ record.out_difference_str }}
+                          {% else %}-{% endif %}
+                        </td>
+                        <td>
+                          {% if record.is_absent %}
+                            {{ record.absence_reason|default:"-" }}
+                          {% else %}-{% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4">
+                            <i class="bi bi-info-circle fs-3 text-primary"></i>
+                            <p class="mt-2">لا توجد سجلات حضور.</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row mt-3 g-3">
+  <div class="col-12 col-md-6">
+    <div class="card bg-light shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-exclamation-circle fs-3 text-danger mb-2"></i>
+        <div class="fs-5 fw-bold">عدد أيام الغياب: {{ absent_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="card bg-light shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-clock-history fs-3 text-primary mb-2"></i>
+        <div class="fs-5 fw-bold">مجموع وقت التأخير: {{ late_total_str }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* شكل select2 الأساسي */
+.select2-container--bootstrap-5 .select2-selection--single {
+    border-radius: 1rem !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-height: 48px;
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem !important;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection--single {
+    text-align: right;
+    direction: rtl;
+    padding-right: 1.5rem !important;
+    padding-left: 2.5rem !important;
+}
+/* سهم كبير في اليسار */
+.select2-container--bootstrap-5.select2-container--rtl .custom-chevron {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 2;
+}
+/* Placeholder رمادي */
+.select2-container--bootstrap-5 .select2-selection__placeholder {
+    color: #aaa !important;
+    font-size: 1.1rem;
+}
+/* قائمة الخيارات */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-radius: 1rem !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    border: none;
+    font-size: 1.15rem;
+}
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 1rem 1.5rem;
+}
+.select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background: #f1f3f4 !important;
+    color: #222 !important;
+}
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background: #f1f3f4 !important;
+    color: #222 !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection__clear {
+    position: absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    float: none !important;
+    z-index: 10;
+    font-size: 1.3rem;
+    color: #888 !important;
+    background: transparent !important;
+    cursor: pointer;
+    display: none !important;
+}
+.select2-container--bootstrap-5.select2-container--rtl .select2-selection--single {
+    position: relative;
+}
+.select2-container--bootstrap-5 .select2-selection__clear,
+.select2-container--default .select2-selection__clear,
+.select2-selection__clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+</style>
+<script>
+$(document).ready(function() {
+    $("#id_employee").select2({
+        theme: "bootstrap-5",
+        placeholder: "اختر الموظف",
+        allowClear: true,
+        dir: "rtl"
+    });
+
+    // إضافة أيقونة SVG يدويًا للسهم في RTL
+    setTimeout(function() {
+        $('.select2-container--rtl .select2-selection--single').each(function() {
+            if ($(this).find('.custom-chevron').length === 0) {
+                $(this).append('<span class="custom-chevron" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#888" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg></span>');
+            }
+        });
+    }, 200);
+
+    function toggleDateFields() {
+      var type = $("input[name='filter_type']:checked").val();
+      if(type === 'date') {
+        $(".filter-date-field").show();
+        $(".filter-range-field").hide();
+      } else {
+        $(".filter-date-field").hide();
+        $(".filter-range-field").show();
+      }
+    }
+    $(document).on('change', "input[name='filter_type']", toggleDateFields);
+    toggleDateFields();
+});
+</script>
+{% endblock %} 

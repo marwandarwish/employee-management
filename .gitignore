@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtualenv
+venv/
+ENV/
+env/
+.venv/
+
+# Django
+*.sqlite3
+db.sqlite3
+/staticfiles/
+/media/
+
+# VSCode/PyCharm
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env files
+.env
+.env.*
+
+# Node/npm (لو استخدمت)
+node_modules/
+
+# Backup
+*.bak
+*.swp
+*.tmp
