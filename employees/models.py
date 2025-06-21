@@ -13,7 +13,7 @@ class Employee(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="نشط")
     base_salary = models.DecimalField(max_digits=10, decimal_places=2)
     variable_incentives = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True, verbose_name="الصورة الشخصية")
+    profile_pic = models.ImageField(upload_to='', blank=True, null=True, verbose_name="الصورة الشخصية")
     work_location = models.CharField(max_length=100, verbose_name="مكان العمل", blank=True, null=True)
 
     def __str__(self):
